@@ -8,7 +8,7 @@ This is a Laravel library to send SMS and switch between multiple SMS Gateways.
 You can install the package via composer:
 
 ``` bash
-composer require kalyan312/laravel-sms-bd
+composer require khbd/laravel-sms-bd
 ```
 The package will register itself automatically.
 
