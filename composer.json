@@ -1,0 +1,38 @@
+{
+  "name": "khbd/laravel-sms-bd",
+  "description": "Laravel sms BD is a Laravel Package for Sending out SMS from multiple Gateways",
+  "license": "MIT",
+  "type": "library",
+  "require": {
+    "php": "^7.2",
+    "illuminate/support": "^6.0|^7.0|^8.0",
+    "ixudra/curl": "6.*"
+  },
+  "authors": [
+    {
+      "name": "Kalyan Halder",
+      "email": "kalyanhalder0@gmail.com",
+      "homepage": "https://github.com/kalyan312",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Khbd\\LaravelSmsBD\\": "src/"
+    },
+    "files": [
+      "src/helpers.php"
+    ]
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Khbd\\LaravelSmsBD\\SMSServiceProvider"
+      ],
+      "aliases": {
+        "SMS": "Khbd\\LaravelSmsBD\\Facades\\SMS"
+      }
+    }
+  },
+  "minimum-stability": "dev"
+}
