@@ -16,7 +16,8 @@ class SMSServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__.'/Config/sms.php' => config_path('sms.php'),
-        ], 'laravel_sms_config');
+            __DIR__.'/Database/Migrations' => database_path('migrations'),
+        ], 'sms');
 
         $this->app->singleton(SMS::class, function () {
             return new SMS();
@@ -40,7 +41,7 @@ class SMSServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(
             __DIR__.'/Config/sms.php',
-            'laravel-sms-bd'
+            'sms'
         );
     }
 }

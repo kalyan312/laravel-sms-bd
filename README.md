@@ -17,6 +17,10 @@ Then publish the package configuration file
 ```bash
 php artisan vendor:publish --provider=Khbd\LaravelSmsBD\SMSServiceProvider
 ```
+or
+```bash
+php artisan vendor:publish --provider=Khbd\LaravelSmsBD\SMSServiceProvider  --tag="sms"
+```
 
 ## Usage
 

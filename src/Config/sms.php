@@ -2,6 +2,20 @@
 
 return [
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Record SMS Log
+    |--------------------------------------------------------------------------
+    |
+    | This value determines that should take sms record in db or not
+    | You can switch to a different gateway at runtime.
+    | set value true to Record Log
+    |
+    */
+
+    'sms_log' => env('SMS_LOG', false),
+
     /*
     |--------------------------------------------------------------------------
     | Default Gateway
@@ -28,6 +42,7 @@ return [
     'gateways' => [
 
         'bangladesh_sms' => [
+            'base_url' => env('BANGLADESH_SMS_BASE_URL'),
             'username' => env('BANGLADESH_SMS_USERNAME'),
             'api_key'  => env('BANGLADESH_SMS_API_KEY'),
             'from'     => env('BANGLADESH_SMS_FROM'),
@@ -48,7 +63,7 @@ return [
     */
 
     'map' => [
-        'bangladesh_sms' => \Khbd\LaravelSmsBD\BangladeshSMS::class,
+        'bangladesh_sms' => \Khbd\LaravelSmsBD\Gateways\BangladeshSMS::class
 
     ],
 ];

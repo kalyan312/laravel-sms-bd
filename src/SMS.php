@@ -3,6 +3,10 @@
 namespace Khbd\LaravelSmsBD;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Khbd\LaravelSmsBD\Models\SmsHistory;
+
+
 
 class SMS
 {
@@ -31,6 +35,12 @@ class SMS
      * @var object
      */
     protected $object = null;
+
+    /**
+     * @var object
+     */
+    protected $smsRecord;
+
 
     /**
      * SMS constructor.
@@ -78,7 +88,19 @@ class SMS
      */
     public function send($recipient, $message, $params = null)
     {
-        return $this->object->send($recipient, $message, $params);
+        if(method_exists($this->object, 'fixNumber') && !$recipient = $this->object->fixNumber($recipient)){
+            return false;
+        }
+
+        if($this->config['sms_log']) {
+            $this->beforeSend($recipient, $message, $params = null);
+        }
+        $object = $this->object->send($recipient, $message, $params);
+        if($this->config['sms_log']) {
+            $this->afterSend();
+        }
+
+        return $object;
     }
 
     /**
@@ -89,6 +111,16 @@ class SMS
     public function is_successful()
     {
         return $this->object->is_successful();
+    }
+
+    /**
+     * return api response getResponseBody
+     *
+     * @return object | array
+     */
+    public function getResponseBody()
+    {
+        return $this->object->getResponseBody();
     }
 
     /**
@@ -117,5 +149,36 @@ class SMS
     public function getDeliveryReports(Request $request)
     {
         return $this->object->getDeliveryReports($request);
+    }
+
+    private function beforeSend($recipient, $message, $params = null){
+        try{
+            $history = new SmsHistory();
+            $history->mobile_number = $recipient;
+            $history->message = $message;
+            $history->created_at = now();
+            $history->save();
+            $this->smsRecord = $history;
+        } catch (\Exception $exception){
+            Log::debug("Faild to save sms message. " . $exception->getMessage());
+        }
+    }
+    private function afterSend(){
+        try{
+            $status = 2;
+            if($this->is_successful()){
+                $status = 1;
+            }
+
+            if(is_object($this->smsRecord)){
+                $this->smsRecord->status = $status;
+                $this->smsRecord->sms_submitted_id = $this->getMessageID();
+                $this->smsRecord->api_response = json_encode($this->getResponseBody());
+                $this->smsRecord->save();
+            }
+
+        }catch (\Exception $exception){
+            $exception->getMessage();
+        }
     }
 }

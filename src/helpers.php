@@ -9,6 +9,6 @@ if (!function_exists('sms')) {
      */
     function sms()
     {
-        return new \CraftedSystems\LaravelSMS\SMS();
+        return new \Khbd\LaravelSmsBD\SMS();
     }
 }

@@ -42,6 +42,13 @@ interface SMSInterface
     public function getMessageID();
 
     /**
+     *  the message API response
+     *
+     * @return object
+     */
+    public function getResponseBody();
+
+    /**
      * @param Request $request
      *
      * @return object
