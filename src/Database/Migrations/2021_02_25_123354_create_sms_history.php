@@ -17,6 +17,7 @@ class CreateSmsHistory extends Migration
             $table->bigIncrements('id');
             $table->string('mobile_number', 16);
             $table->string('message', 480)->nullable();
+            $table->string('gateway', 60)->nullable();
             $table->tinyInteger('status', false, true)->default(0)->comment('0=request to send, 1 = send, 2 = failed');
             $table->string('api_response', 480)->nullable();
             $table->string('sms_submitted_id', 50)->nullable();

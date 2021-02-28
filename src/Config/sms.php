@@ -14,6 +14,19 @@ return [
     |
     */
 
+    'sms_activate' => env('SMS_ACTIVATE', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Record SMS Log
+    |--------------------------------------------------------------------------
+    |
+    | This value determines that should take sms record in db or not
+    | You can switch to a different gateway at runtime.
+    | set value true to Record Log
+    |
+    */
+
     'sms_log' => env('SMS_LOG', false),
 
     /*

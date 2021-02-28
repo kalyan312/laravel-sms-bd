@@ -88,12 +88,14 @@ class SMS
      */
     public function send($recipient, $message, $params = null)
     {
-        if(method_exists($this->object, 'fixNumber') && !$recipient = $this->object->fixNumber($recipient)){
+        if($this->config['sms_activate'] == false) {
             return false;
         }
-
         if($this->config['sms_log']) {
             $this->beforeSend($recipient, $message, $params = null);
+        }
+        if(method_exists($this->object, 'fixNumber') && !$recipient = $this->object->fixNumber($recipient)){
+            return false;
         }
         $object = $this->object->send($recipient, $message, $params);
         if($this->config['sms_log']) {
@@ -156,6 +158,7 @@ class SMS
             $history = new SmsHistory();
             $history->mobile_number = $recipient;
             $history->message = $message;
+            $history->gateway = $this->gateway;
             $history->created_at = now();
             $history->save();
             $this->smsRecord = $history;
