@@ -90,15 +90,15 @@ sms()->gateway('mygateway')->getDeliveryReports(Request $request);
 Currently Default SMS Gateway is [Bangladesh SMS](http://bangladeshsms.com/)
 
 So .env config is following -
-
+```bash
 BANGLADESH_SMS_BASE_URL = 'http://bangladeshsms.com'
 BANGLADESH_SMS_USERNAME = 'username'
 BANGLADESH_SMS_API_KEY = 'api_key'
 BANGLADESH_SMS_FROM = 'api_provided_number'
 
-SMS_LOG = true  // true = if you want to save sms log in database
 SMS_ACTIVATE = true // true = if you want to enable sms sending functionality 
-
+SMS_LOG = true  // true = if you want to save sms log in database
+```
 
 ## Contributing
 
