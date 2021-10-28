@@ -60,6 +60,14 @@ return [
             'api_key'  => env('BANGLADESH_SMS_API_KEY'),
             'from'     => env('BANGLADESH_SMS_FROM'),
         ],
+
+        'teletalk_sms' => [
+            'base_url' => env('TELETALK_SMS_BASE_URL'),
+            'username' => env('TELETALK_SMS_USERNAME'),
+            'password'  => env('TELETALK_SMS_PASSWORD'),
+            'acode'     => env('TELETALK_SMS_ACODE'),
+            'masking'     => env('TELETALK_SMS_MASKING'),
+        ],
     ],
 
     /*
@@ -76,7 +84,7 @@ return [
     */
 
     'map' => [
-        'bangladesh_sms' => \Khbd\LaravelSmsBD\Gateways\BangladeshSMS::class
-
+        'bangladesh_sms' => \Khbd\LaravelSmsBD\Gateways\BangladeshSMS::class,
+        'teletalk_sms' => \Khbd\LaravelSmsBD\Gateways\TeletalkSMS::class
     ],
 ];

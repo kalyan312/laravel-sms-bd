@@ -156,8 +156,8 @@ class SMS
     private function beforeSend($recipient, $message, $params = null){
         try{
             $history = new SmsHistory();
-            $history->mobile_number = $recipient;
-            $history->message = $message;
+            $history->mobile_number = is_array($recipient) ? json_encode($recipient) : $recipient;
+            $history->message = is_array($message) ? json_encode($message) : $message;
             $history->gateway = $this->gateway;
             $history->created_at = now();
             $history->save();
@@ -175,7 +175,7 @@ class SMS
 
             if(is_object($this->smsRecord)){
                 $this->smsRecord->status = $status;
-                $this->smsRecord->sms_submitted_id = $this->getMessageID();
+                $this->smsRecord->sms_submitted_id = is_array($this->getMessageID()) ? json_encode($this->getMessageID()) : $this->getMessageID();
                 $this->smsRecord->api_response = json_encode($this->getResponseBody());
                 $this->smsRecord->save();
             }

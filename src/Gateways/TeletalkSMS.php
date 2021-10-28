@@ -2,11 +2,12 @@
 
 namespace Khbd\LaravelSmsBD\Gateways;
 
+use Illuminate\Support\Facades\Log;
 use Khbd\LaravelSmsBD\Interfaces\SMSInterface;
-use Khbd\LaravelSmsBD\SDK\BangladeshSMS\BangladeshSMS as SMSGateway;
+use Khbd\LaravelSmsBD\SDK\TeletalkSMS\TeletalkSMS as SMSGateway;
 use Illuminate\Http\Request;
 
-class BangladeshSMS implements SMSInterface
+class TeletalkSMS implements SMSInterface
 {
     /**
      * @var array
@@ -46,27 +47,38 @@ class BangladeshSMS implements SMSInterface
     }
 
     /**
-     * @param $recipient
+     * @param string | array $recipient
      * @param $message
      * @param null $params
      *
      * @return object
      */
-    public function send(string $recipient, string $message, $params = null)
+    public function send($recipient, string $message, $is_unicode = false)
     {
-
-        $AT = new SMSGateway($this->settings->base_url, $this->settings->username, $this->settings->api_key, $this->settings->from);
-        $this->smsResponse = $AT->send($recipient, $message);
-        $msg = strtolower($this->smsResponse);
+        $AT = new SMSGateway($this->settings->base_url, $this->settings->username, $this->settings->password, $this->settings->acode, $this->settings->masking);
+        $this->smsResponse = $AT->send($recipient, $message, $is_unicode);
+        $content  = json_decode($this->smsResponse['content'], true);
         $status = false;
         $messageID = null;
-        if(strpos($msg, 'sms submitted:') !== false){
+        Log::debug("message", $this->smsResponse);
+        Log::info("message", $this->smsResponse);
+
+        if(isset($content) && empty($content['error_code'])){
+            // success
             $status = true;
-            $id = explode('-', $msg);
-            if(isset($id[1])){
-                $messageID = trim($id[1]);
+            $smsRawId = $content['smsInfo'];
+            $messageID = '';
+            if(is_array($smsRawId) && count($smsRawId) == 1){
+                $messageID = $smsRawId[0]['smsID'];
+            }else{
+                $messageID = json_encode($smsRawId);
             }
+        }else if (isset($content['error_code']) && $content['error_code'] < 0){
+            $messageID =  "Error code - " . $content['error_code'] . " and Message - " . $content['description'];
+        } else {
+            $messageID = json_encode($content);
         }
+
         $this->is_success = $status;      // define what determines success from the response
         $this->message_id = $messageID;   // reference the message id here. auto generate if not available
 
@@ -108,9 +120,9 @@ class BangladeshSMS implements SMSInterface
      */
     public function getBalance()
     {
-        $AT = new SMSGateway($this->settings->base_url, $this->settings->username, $this->settings->api_key, $this->settings->from);
-        return $AT->balance();
+       return 'API provider dont provide balance status.';
     }
+
 
     /**
      * @param Request $request
@@ -134,18 +146,5 @@ class BangladeshSMS implements SMSInterface
         ];
 
         return (object) $data;
-    }
-
-    public function fixNumber($number){
-       $validCheckPattern = "/^(?:\+88|01)?(?:\d{11}|\d{13})$/";
-       if(preg_match($validCheckPattern, $number)){
-           if(preg_match('/^(?:01)\d+$/', $number)){
-               $number = '+88' . $number;
-           }
-
-           return $number;
-       }
-
-       return false;
     }
 }

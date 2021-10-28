@@ -87,6 +87,7 @@ sms()->gateway('mygateway')->getDeliveryReports(Request $request);
 
 ## .env Config
 
+# Bangladesh SMS
 Currently Default SMS Gateway is [Bangladesh SMS](http://bangladeshsms.com/)
 
 So .env config is following -
@@ -100,6 +101,19 @@ SMS_ACTIVATE = true // true = if you want to enable sms sending functionality
 SMS_LOG = true  // true = if you want to save sms log in database
 ```
 
+#Teletalk SMS
+If you use teletalk sms gateway, please set following config value in .env file of config/sms.php file -
+
+```bash
+TELETALK_SMS_BASE_URL = 'http://bulkmsg.teletalk.com.bd'
+TELETALK_SMS_USERNAME = 'APIUsername'
+TELETALK_SMS_PASSWORD = 'APIPassword'
+TELETALK_SMS_ACODE = 'YourA-Code'
+TELETALK_SMS_MASKING = 'MaskingNumber'
+
+SMS_ACTIVATE = true // true = if you want to enable sms sending functionality 
+SMS_LOG = true  // true = if you want to save sms log in database
+```
 ## Contributing
 
 Suggestions, pull requests , bug reporting and code improvements are all welcome. Feel free.
