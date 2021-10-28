@@ -101,7 +101,7 @@ SMS_ACTIVATE = true // true = if you want to enable sms sending functionality
 SMS_LOG = true  // true = if you want to save sms log in database
 ```
 
-#Teletalk SMS
+# Teletalk SMS
 If you use teletalk sms gateway, please set following config value in .env file of config/sms.php file -
 
 ```bash
