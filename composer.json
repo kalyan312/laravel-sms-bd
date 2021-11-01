@@ -4,8 +4,9 @@
   "license": "MIT",
   "type": "library",
   "require": {
-    "php": "^7.2",
-    "ixudra/curl": "6.*"
+    "php": "^7.2|^8.0",
+    "ixudra/curl": "6.*",
+    "ext-json": "*"
   },
   "authors": [
     {

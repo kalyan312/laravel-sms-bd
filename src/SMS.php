@@ -159,7 +159,7 @@ class SMS
             $history->mobile_number = is_array($recipient) ? json_encode($recipient) : $recipient;
             $history->message = is_array($message) ? json_encode($message) : $message;
             $history->gateway = $this->gateway;
-            $history->created_at = now();
+            $history->created_at = getCurrentDateTime();
             $history->save();
             $this->smsRecord = $history;
         } catch (\Exception $exception){
