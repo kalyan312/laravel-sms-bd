@@ -2,9 +2,10 @@
 
 namespace Khbd\LaravelSmsBD\Gateways;
 
+use Exception;
+use Illuminate\Http\Request;
 use Khbd\LaravelSmsBD\Interfaces\SMSInterface;
 use Khbd\LaravelSmsBD\SDK\BangladeshSMS\BangladeshSMS as SMSGateway;
-use Illuminate\Http\Request;
 
 class BangladeshSMS implements SMSInterface
 {
@@ -36,34 +37,35 @@ class BangladeshSMS implements SMSInterface
     /**
      * @param $settings
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct($settings)
     {
         // initiate settings (username, api_key, etc)
 
-        $this->settings = (object) $settings;
+        $this->settings = (object)$settings;
     }
 
     /**
-     * @param $recipient
-     * @param $message
+     * @param string $recipient
+     * @param string $message
      * @param null $params
      *
      * @return object
+     * @throws Exception
      */
     public function send(string $recipient, string $message, $params = null)
     {
-
+        $this->gatewayParamException();
         $AT = new SMSGateway($this->settings->base_url, $this->settings->username, $this->settings->api_key, $this->settings->from);
         $this->smsResponse = $AT->send($recipient, $message);
         $msg = strtolower($this->smsResponse);
         $status = false;
         $messageID = null;
-        if(strpos($msg, 'sms submitted:') !== false){
+        if (strpos($msg, 'sms submitted:') !== false) {
             $status = true;
             $id = explode('-', $msg);
-            if(isset($id[1])){
+            if (isset($id[1])) {
                 $messageID = trim($id[1]);
             }
         }
@@ -128,24 +130,44 @@ class BangladeshSMS implements SMSInterface
         }
 
         $data = [
-            'status'       => $fs,
-            'message_id'   => $request->id,
+            'status' => $fs,
+            'message_id' => $request->id,
             'phone_number' => '',
         ];
 
-        return (object) $data;
+        return (object)$data;
     }
 
-    public function fixNumber($number){
-       $validCheckPattern = "/^(?:\+88|01)?(?:\d{11}|\d{13})$/";
-       if(preg_match($validCheckPattern, $number)){
-           if(preg_match('/^(?:01)\d+$/', $number)){
-               $number = '+88' . $number;
-           }
+    public function fixNumber($number)
+    {
+        $validCheckPattern = "/^(?:\+88|01)?(?:\d{11}|\d{13})$/";
+        if (preg_match($validCheckPattern, $number)) {
+            if (preg_match('/^(?:01)\d+$/', $number)) {
+                $number = '+88' . $number;
+            }
 
-           return $number;
-       }
+            return $number;
+        }
 
-       return false;
+        return false;
+    }
+
+    /**
+     * Exception if any params is missing during request to bangladesh_sms server
+     * @throws Exception
+     */
+    private function gatewayParamException()
+    {
+        $params = [
+            'BANGLADESH_SMS_USERNAME' => $this->settings->username,
+            'BANGLADESH_SMS_API_KEY' => $this->settings->api_key,
+            'BANGLADESH_SMS_FROM' => $this->settings->from,
+        ];
+
+        foreach ($params as $key => $param) {
+
+            if (empty($param) || $param == null)
+                throw new Exception($key . ' is missing for gateway ' . get_class($this) . '; Please check .env file');
+        }
     }
 }

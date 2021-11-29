@@ -2,10 +2,11 @@
 
 namespace Khbd\LaravelSmsBD\Gateways;
 
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Khbd\LaravelSmsBD\Interfaces\SMSInterface;
 use Khbd\LaravelSmsBD\SDK\TeletalkSMS\TeletalkSMS as SMSGateway;
-use Illuminate\Http\Request;
 
 class TeletalkSMS implements SMSInterface
 {
@@ -37,44 +38,46 @@ class TeletalkSMS implements SMSInterface
     /**
      * @param $settings
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct($settings)
     {
         // initiate settings (username, api_key, etc)
 
-        $this->settings = (object) $settings;
+        $this->settings = (object)$settings;
     }
 
     /**
      * @param string | array $recipient
-     * @param $message
-     * @param null $params
-     *
+     * @param string $message
+     * @param bool $is_unicode
      * @return object
+     * @throws Exception
      */
     public function send($recipient, string $message, $is_unicode = false)
     {
+
+        $this->gatewayParamException();
         $AT = new SMSGateway($this->settings->base_url, $this->settings->username, $this->settings->password, $this->settings->acode, $this->settings->masking);
         $this->smsResponse = $AT->send($recipient, $message, $is_unicode);
-        $content  = json_decode($this->smsResponse['content'], true);
+        $content = json_decode($this->smsResponse['content'], true);
         $status = false;
         $messageID = null;
         Log::debug("message", $this->smsResponse);
         Log::info("message", $this->smsResponse);
 
-        if(isset($content) && empty($content['error_code'])){
+        if (isset($content) && empty($content['error_code'])) {
             // success
             $status = true;
             $smsRawId = $content['smsInfo'];
             $messageID = '';
-            if(is_array($smsRawId) && count($smsRawId) == 1){
+            if (is_array($smsRawId) && count($smsRawId) == 1) {
                 $messageID = $smsRawId[0]['smsID'];
-            }else{
+            } else {
                 $messageID = json_encode($smsRawId);
             }
-        }else if (isset($content['error_code']) && $content['error_code'] < 0){
-            $messageID =  "Error code - " . $content['error_code'] . " and Message - " . $content['description'];
+        } else if (isset($content['error_code']) && $content['error_code'] < 0) {
+            $messageID = "Error code - " . $content['error_code'] . " and Message - " . $content['description'];
         } else {
             $messageID = json_encode($content);
         }
@@ -120,7 +123,7 @@ class TeletalkSMS implements SMSInterface
      */
     public function getBalance()
     {
-       return 'API provider dont provide balance status.';
+        return 'API provider dont provide balance status.';
     }
 
 
@@ -140,11 +143,31 @@ class TeletalkSMS implements SMSInterface
         }
 
         $data = [
-            'status'       => $fs,
-            'message_id'   => $request->id,
+            'status' => $fs,
+            'message_id' => $request->id,
             'phone_number' => '',
         ];
 
-        return (object) $data;
+        return (object)$data;
+    }
+
+    /**
+     * Exception if any params is missing during request to teletalk server
+     * @throws Exception
+     */
+    private function gatewayParamException()
+    {
+        $params = [
+            'TELETALK_SMS_USERNAME' => $this->settings->username,
+            'TELETALK_SMS_PASSWORD' => $this->settings->password,
+            'TELETALK_SMS_ACODE' => $this->settings->acode,
+            'TELETALK_SMS_MASKING' => $this->settings->masking,
+        ];
+
+        foreach ($params as $key => $param) {
+
+            if (empty($param) || $param == null)
+                throw new Exception( $key . ' is missing for gateway ' . get_class($this) . '; Please check .env file');
+        }
     }
 }
