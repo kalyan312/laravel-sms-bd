@@ -2,9 +2,11 @@
 
 namespace Khbd\LaravelSmsBD;
 
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Khbd\LaravelSmsBD\Models\SmsHistory;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -45,7 +47,7 @@ class SMS
     /**
      * SMS constructor.
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct()
     {
@@ -85,20 +87,22 @@ class SMS
      * @param null $params
      *
      * @return mixed
+     * @throws Exception
      */
     public function send($recipient, $message, $params = null)
     {
-        if($this->config['sms_activate'] == false) {
+        if ($this->config['sms_activate'] == false) {
             return false;
         }
-        if($this->config['sms_log']) {
+        if ($this->config['sms_log']) {
             $this->beforeSend($recipient, $message, $params = null);
         }
-        if(method_exists($this->object, 'fixNumber') && !$recipient = $this->object->fixNumber($recipient)){
+        if (method_exists($this->object, 'fixNumber') && !$recipient = $this->object->fixNumber($recipient)) {
             return false;
         }
+
         $object = $this->object->send($recipient, $message, $params);
-        if($this->config['sms_log']) {
+        if ($this->config['sms_log']) {
             $this->afterSend();
         }
 
@@ -106,7 +110,7 @@ class SMS
     }
 
     /**
-     * define when the a message is successfully sent.
+     * define when a message is successfully sent.
      *
      * @return bool
      */
@@ -153,8 +157,19 @@ class SMS
         return $this->object->getDeliveryReports($request);
     }
 
-    private function beforeSend($recipient, $message, $params = null){
-        try{
+    /**
+     * @param $recipient
+     * @param $message
+     * @param null $params
+     * @throws Exception
+     */
+    private function beforeSend($recipient, $message, $params = null)
+    {
+        if (!Schema::hasTable('sms_history')) {
+            throw new Exception('Failed to save message. Schema table sms_history does not exist');
+        }
+
+        try {
             $history = new SmsHistory();
             $history->mobile_number = is_array($recipient) ? json_encode($recipient) : $recipient;
             $history->message = is_array($message) ? json_encode($message) : $message;
@@ -162,25 +177,27 @@ class SMS
             $history->created_at = getCurrentDateTime();
             $history->save();
             $this->smsRecord = $history;
-        } catch (\Exception $exception){
-            Log::debug("Faild to save sms message. " . $exception->getMessage());
+        } catch (Exception $exception) {
+            Log::debug("Failed to save sms message. " . $exception->getMessage());
         }
     }
-    private function afterSend(){
-        try{
+
+    private function afterSend()
+    {
+        try {
             $status = 2;
-            if($this->is_successful()){
+            if ($this->is_successful()) {
                 $status = 1;
             }
 
-            if(is_object($this->smsRecord)){
+            if (is_object($this->smsRecord)) {
                 $this->smsRecord->status = $status;
                 $this->smsRecord->sms_submitted_id = is_array($this->getMessageID()) ? json_encode($this->getMessageID()) : $this->getMessageID();
                 $this->smsRecord->api_response = json_encode($this->getResponseBody());
                 $this->smsRecord->save();
             }
 
-        }catch (\Exception $exception){
+        } catch (Exception $exception) {
             $exception->getMessage();
         }
     }

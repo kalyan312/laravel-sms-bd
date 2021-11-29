@@ -55,14 +55,14 @@ return [
     'gateways' => [
 
         'bangladesh_sms' => [
-            'base_url' => env('BANGLADESH_SMS_BASE_URL'),
+            'base_url' => env('BANGLADESH_SMS_BASE_URL','http://bangladeshsms.com'),
             'username' => env('BANGLADESH_SMS_USERNAME'),
             'api_key'  => env('BANGLADESH_SMS_API_KEY'),
             'from'     => env('BANGLADESH_SMS_FROM'),
         ],
 
         'teletalk_sms' => [
-            'base_url' => env('TELETALK_SMS_BASE_URL'),
+            'base_url' => env('TELETALK_SMS_BASE_URL','http://bulkmsg.teletalk.com.bd'),
             'username' => env('TELETALK_SMS_USERNAME'),
             'password'  => env('TELETALK_SMS_PASSWORD'),
             'acode'     => env('TELETALK_SMS_ACODE'),
