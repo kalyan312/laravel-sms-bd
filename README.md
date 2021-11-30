@@ -28,7 +28,7 @@ For Lumen usage the service provider should be registered manually as follow in 
 $app->register(Khbd\LaravelSmsBD\SMSServiceProvider::class);
 
 ```
-Copy <a href="https://github.com/tasmidur/laravel-wso2-identity-api-user/blob/main/src/Config/IdpUser.php">IdpUser</a> file to config directory. Then add the bellow text to the bootstrap/app.php:
+Copy <a href="https://github.com/tasmidur/laravel-sms-bd/blob/master/src/Config/sms.php">sms.php</a> file to config directory. Then add the bellow text to the bootstrap/app.php:
 
 ```bash
 $app->configure('sms');
