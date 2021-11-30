@@ -9,6 +9,7 @@ You can install the package via composer:
 
 ``` bash
 composer require khbd/laravel-sms-bd
+composer require ixudra/curl
 ```
 The package will register itself automatically.
 
@@ -26,6 +27,7 @@ For Lumen usage the service provider should be registered manually as follow in 
 
 ```bash
 $app->register(Khbd\LaravelSmsBD\SMSServiceProvider::class);
+$app->register(Ixudra\Curl\CurlServiceProvider::class);
 
 ```
 Copy <a href="https://github.com/tasmidur/laravel-sms-bd/blob/master/src/Config/sms.php">sms.php</a> file to config directory. Then add the bellow text to the bootstrap/app.php:
