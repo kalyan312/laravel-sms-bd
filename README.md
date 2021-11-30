@@ -4,7 +4,7 @@
 This is a Laravel library to send SMS and switch between multiple SMS Gateways.
 
 ## Installation
-
+## For Laravel
 You can install the package via composer:
 
 ``` bash
@@ -21,6 +21,19 @@ or
 ```bash
 php artisan vendor:publish --provider=Khbd\LaravelSmsBD\SMSServiceProvider  --tag="sms"
 ```
+## For Lumen
+For Lumen usage the service provider should be registered manually as follow in bootstrap/app.php:
+
+```bash
+$app->register(Khbd\LaravelSmsBD\SMSServiceProvider::class);
+
+```
+Copy <a href="https://github.com/tasmidur/laravel-wso2-identity-api-user/blob/main/src/Config/IdpUser.php">IdpUser</a> file to config directory. Then add the bellow text to the bootstrap/app.php:
+
+```bash
+$app->configure('sms');
+```
+
 For store sms log in db run migration
 ```bash
 php artisan migrate
